@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
 
+
 public class FruitManager : MonoBehaviour
 {
     [Header("Elements")]
@@ -10,16 +11,25 @@ public class FruitManager : MonoBehaviour
 
     [Header("Data")]
     [SerializeField] private double totalFruitNumber;
+    [SerializeField] private int frenzyModeMultiplier;
     [SerializeField] private int FruitIncrement;
+
+    
+    /*Delegate assignments*/
     private void Awake()
     {   
         LoadData();
+        FruitIncrement = 1;
         InputManager.onFruitClicked += FruitClickedCallback;
+        Cube.onFrenzyModeStart += StartFrenzyModeCallback;
+        Cube.onFrenzyModeStop += StopFrenzyModeCallback;
     }
 
     private void OnDestroy()
     {
         InputManager.onFruitClicked -= FruitClickedCallback;
+        Cube.onFrenzyModeStart -= StartFrenzyModeCallback;
+        Cube.onFrenzyModeStop -= StopFrenzyModeCallback;
     }
 
     // Update is called once per frame
@@ -34,8 +44,10 @@ public class FruitManager : MonoBehaviour
 
         UpdateFruitText();
         SaveData();
-    }
 
+
+    }
+    //--------UI Update----------------
     private void UpdateFruitText()
     {   
         if(totalFruitNumber<=1)
@@ -47,6 +59,7 @@ public class FruitManager : MonoBehaviour
         amountText.text = totalFruitNumber + " Peaches!";  
         }
     }
+    //-----------------Save and Load data -------
     private void SaveData()
     {
         PlayerPrefs.SetString("TotalFruitNumber", totalFruitNumber.ToString());
@@ -57,5 +70,20 @@ public class FruitManager : MonoBehaviour
        double.TryParse(PlayerPrefs.GetString("TotalFruitNumber", "0"), out totalFruitNumber);
 
         UpdateFruitText();
+    }
+
+    //---------Change the multiplier of cube in frenzy mode-----
+    private void StartFrenzyModeCallback()
+    {
+        FruitIncrement = frenzyModeMultiplier;
+    }
+    private void StopFrenzyModeCallback()
+    {
+        FruitIncrement = 1;
+    }
+
+    public int getCurrentMultiplier()
+    {
+        return FruitIncrement;
     }
 }
